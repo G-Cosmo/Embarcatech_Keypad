@@ -7,8 +7,6 @@
 
 #define ROWS 4
 #define COLS 4
-
-//definindo as notas musicais
 #define NOTE_DO1  261
 #define NOTE_RE  294
 #define NOTE_MI  329
@@ -18,13 +16,14 @@
 #define NOTE_SI  493
 #define NOTE_DO2  523
 
-//define os pinos do teclado e dos leds
+
 const uint col_pins[4] = {4, 3, 2, 1}; 
 const uint row_pins[4] = {8, 7, 6, 5};
 const uint rgb_1[3] = {28, 27, 26};
 const uint rgb_2[3] = {22, 21, 20};
 const uint rgb_3[3] = {19, 18, 17};
 const uint buzzer_pin = 14; // GPIO do buzzer
+
 
 // Matrize de mapeamento de teclas
 const char keys[ROWS][COLS] = {
@@ -140,7 +139,8 @@ char pico_scan_keypad() {
     return '\0'; // Retorna null se nenhum botão for pressionado
 }
 
-void pico_keyboard_control_led(char key) {
+
+void pico_keypad_control_led(char key) {
     switch (key) {
         case '1':
             gpio_put(rgb_1[0], !gpio_get(rgb_1[0]));    //se a tecla 1 for pressionada, alterna o estado do canal vermelho do led 1
@@ -164,7 +164,7 @@ void pico_keyboard_control_led(char key) {
 }
 
 //função para controlar o teclado no modo de reprodução de música
-void pico_keyboard_control_music(char key) {
+void pico_keypad_control_music(char key) {
     switch (key) {
         case '1': 
             pico_buzzer_play(buzzer_pin, NOTE_DO1);
@@ -216,13 +216,12 @@ void pico_keyboard_control_music(char key) {
 int main() {
     char key;
     bool music_mode = false; // Estado inicial: modo padrão (LEDs)
+    stdio_init_all();
     pico_setup_keypad();
     pico_rgb_init(rgb_1);
     pico_rgb_init(rgb_2);
    // pico_rgb_init(rgb_3);
     pico_buzzer_init(buzzer_pin);
-
-    
     
     while (true) {
         key = pico_scan_keypad(); // Verifica se há alguma tecla pressionada
@@ -235,11 +234,10 @@ int main() {
             }
 
             if (music_mode) {
-                pico_keyboard_control_music(key); // Executa a ação correspondente no modo de música
+                pico_keypad_control_music(key); // Executa a ação correspondente no modo de música
             } else {
-                pico_keyboard_control_led(key); // Executa a ação correspondente no modo padrão (LEDs)
+                pico_keypad_control_led(key); // Executa a ação correspondente no modo padrão (LEDs)
             }
-        }
         sleep_ms(100); // Pausa para evitar leitura repetida contínua
     }
 
