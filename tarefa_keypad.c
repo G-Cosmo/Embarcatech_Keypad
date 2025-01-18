@@ -240,7 +240,7 @@ int main() {
             }
         sleep_ms(100); // Pausa para evitar leitura repetida contínua
     }
-
+    }
     return 0;
 
 }

@@ -46,7 +46,7 @@ pico_enable_stdio_usb(tarefa_keypad 1)
 
 # Add the standard library to the build
 target_link_libraries(tarefa_keypad 
-hardware_pwm
+        hardware_pwm
         pico_stdlib)
 
 # Add the standard include files to the build
