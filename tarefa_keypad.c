@@ -2,32 +2,27 @@
 #include "pico/stdlib.h"
 #include "hardware/timer.h"
 
-//define o LED de saída
-#define GPIO_LED 18
+#define ROWS 4
+#define COLS 4
 
-//define os pinos do teclado com as portas GPIO
-uint columns[4] = {4, 3, 2, 1}; 
-uint rows[4] = {8, 7, 6, 5};
-uint rgb_1[3] = {28, 27, 26};
-uint rgb_2[3] = {22, 21, 20};
-uint rgb_3[3] = {19, 18, 17};
+//define os pinos do teclado e dos leds
+const uint col_pins[4] = {4, 3, 2, 1}; 
+const uint row_pins[4] = {8, 7, 6, 5};
+const uint rgb_1[3] = {28, 27, 26};
+const uint rgb_2[3] = {22, 21, 20};
+const uint rgb_3[3] = {19, 18, 17};
 
-//mapa de teclas
-char KEY_MAP[16] = {
-    '1', '2' , '3', 'A',
-    '4', '5' , '6', 'B',
-    '7', '8' , '9', 'C',
-    '*', '0' , '#', 'D'
+
+// Matrize de mapeamento de teclas
+const char keys[ROWS][COLS] = {
+    {'1', '2', '3', 'A'},
+    {'4', '5', '6', 'B'},
+    {'7', '8', '9', 'C'},
+    {'*', '0', '#', 'D'}
 };
 
-uint _columns[4];
-uint _rows[4];
-char _matrix_values[16];
-uint all_columns_mask = 0x0;
-uint column_mask[4];
-
 //função que inicializa os pinos de um led RGB
-void pico_rgb_init(uint *rgb_pin)
+void pico_rgb_init(const uint *rgb_pin)
 {   
     
     for(int i = 0; i < 3; i++)
@@ -39,7 +34,7 @@ void pico_rgb_init(uint *rgb_pin)
     }
 }
 
-void pico_rgb_turn_off(uint *rgb_pin)
+void pico_rgb_turn_off(const uint *rgb_pin)
 {
     for(int i = 0; i < 3; i++)
     {
@@ -47,7 +42,7 @@ void pico_rgb_turn_off(uint *rgb_pin)
     }
 }
 
-void pico_rgb_turn_on(uint *rgb_pin)
+void pico_rgb_turn_on(const uint *rgb_pin)
 {
     for(int i = 0; i < 3; i++)
     {
@@ -55,129 +50,78 @@ void pico_rgb_turn_on(uint *rgb_pin)
     }
 }
 
-//inicializa o keypad
-void pico_keypad_init(uint columns[4], uint rows[4], char matrix_values[16]) {
-
-    for (int i = 0; i < 16; i++) {
-        _matrix_values[i] = matrix_values[i];
+void pico_setup_keypad() {
+    // Configura os pinos das linhas como saída e os pinos das colunas como entrada
+    for (int i = 0; i < ROWS; i++) {
+        gpio_init(row_pins[i]);
+        gpio_set_dir(row_pins[i], GPIO_OUT);
+        gpio_put(row_pins[i], 1); // Inicializa as linhas com nível alto
     }
 
-    for (int i = 0; i < 4; i++) {
-
-        _columns[i] = columns[i];
-        _rows[i] = rows[i];
-
-        gpio_init(_columns[i]);
-        gpio_init(_rows[i]);
-
-        gpio_set_dir(_columns[i], GPIO_IN);
-        gpio_set_dir(_rows[i], GPIO_OUT);
-
-        gpio_put(_rows[i], 1);
-
-        all_columns_mask = all_columns_mask + (1 << _columns[i]);
-        column_mask[i] = 1 << _columns[i];
+    for (int i = 0; i < COLS; i++) {
+        gpio_init(col_pins[i]);
+        gpio_set_dir(col_pins[i], GPIO_IN);
+        gpio_pull_up(col_pins[i]); // Ativa o pull-up nas colunas
     }
 }
 
-//coleta o caracter pressionado
-char pico_keypad_get_key(void) {
-    int row;
-    uint32_t cols;
-    bool pressed = false;
-
-    cols = gpio_get_all();
-    cols = cols & all_columns_mask;
-    //imprimir_binario(cols);
-    
-    if (cols == 0x0) {
-        return 0;
+char pico_scan_keypad() {
+    for (int r = 0; r < ROWS; r++) {
+        gpio_put(row_pins[r], 0); // Ativa a linha (coloca em nível baixo)
+        for (int c = 0; c < COLS; c++) {
+            if (gpio_get(col_pins[c]) == 0) { // Verifica se o botão foi pressionado
+                while (gpio_get(col_pins[c]) == 0) {
+                    // Espera até que o botão seja liberado
+                }
+                return keys[r][c]; // Retorna a tecla pressionada
+            }
+        }
+        gpio_put(row_pins[r], 1); // Desativa a linha (coloca em nível alto)
     }
+    return '\0'; // Retorna null se nenhum botão for pressionado
+}
 
-    for (int j = 0; j < 4; j++) {
-        gpio_put(_rows[j], 0);
-    }
-
-    for (row = 0; row < 4; row++) {
-
-        gpio_put(_rows[row], 1);
-
-        busy_wait_us(10000);
-
-        cols = gpio_get_all();
-        gpio_put(_rows[row], 0);
-        cols = cols & all_columns_mask;
-        if (cols != 0x0) {
+void pico_rgb_control(char key) {
+    switch (key) {
+        case '1':
+            gpio_put(rgb_1[0], !gpio_get(rgb_1[0]));    //se a tecla 1 for pressionada, alterna o estado do canal vermelho do led 1
+            printf("Canal vermelho do led 1 alternado.\n");
             break;
-        }   
-    }
-
-    for (int i = 0; i < 4; i++) {
-        gpio_put(_rows[i], 1);
-    }
-
-    if (cols == column_mask[0]) {
-        return (char)_matrix_values[row * 4 + 0];
-    }
-    else if (cols == column_mask[1]) {
-        return (char)_matrix_values[row * 4 + 1];
-    }
-    if (cols == column_mask[2]) {
-        return (char)_matrix_values[row * 4 + 2];
-    }
-    else if (cols == column_mask[3]) {
-        return (char)_matrix_values[row * 4 + 3];
-    }
-    else {
-        return 0;
+        case '2':
+            gpio_put(rgb_1[1], !gpio_get(rgb_1[1]));
+            printf("Canal verde do led 1 alternado.\n"); //se a tecla 2 for pressionada, alterna o estado do canal verde do led 1
+            break;
+        case '3':
+            gpio_put(rgb_1[2], !gpio_get(rgb_1[2]));    //se a tecla 3 for pressionada, alterna o estado do canal azul do led 1
+            printf("Canal azul do led 1 alternado.\n");
+            break;
+        case 'A':
+            pico_rgb_turn_off(rgb_1); //se a tecla pressionada for o A, desliga todo o led rgb
+            printf("Led 1 desligado\n");
+            break;
+        default:
+            break;
     }
 }
-
-
 
 //função principal
 int main() {
+    char key;
     stdio_init_all();
-    pico_keypad_init(columns, rows, KEY_MAP);
-    char caracter_press;
+    pico_setup_keypad();
     pico_rgb_init(rgb_1);
     pico_rgb_init(rgb_2);
-    pico_rgb_init(rgb_3);
+   // pico_rgb_init(rgb_3);
 
-
+    
     while (true) {
-        caracter_press = pico_keypad_get_key();
-        printf("\nTecla pressionada: %c\n", caracter_press);
-
-        switch(caracter_press)
-        {
-            case '1':
-                gpio_put(rgb_1[0], !gpio_get(rgb_1[0])); //se a tecla pressionada for o 1, da toggle no RED do primeiro led rgb
-                break;
-            case '2':
-                gpio_put(rgb_1[1], !gpio_get(rgb_1[1])); //se a tecla pressionada for o 2, da toggle no GREEN do primeiro led rgb
-                break;
-            case '3':
-                gpio_put(rgb_1[2], !gpio_get(rgb_1[2])); //se a tecla pressionada for o 3, da toggle no BLUE do primeiro led rgb
-                break;
-            case 'A':
-                //pico_rgb_turn_on(rgb_1);
-                //pico_rgb_turn_off(rgb_1); //se a tecla pressionada for o A, desliga todo o led rgb
-                break;
-            default:
-                break;
+        key = pico_scan_keypad(); // Verifica se há alguma tecla pressionada
+        if (key != '\0') {
+            pico_rgb_control(key); // Executa a ação correspondente
         }
-        
-
-     /*   //Avaliação de caractere para o LED
-        if (caracter_press=='B')
-        {
-            gpio_put(GPIO_LED,true);
-        }else
-        {
-            gpio_put(GPIO_LED,false);
-        }
-        busy_wait_us(500000);
-        */
+        sleep_ms(100); // Pausa para evitar leitura repetida contínua
     }
+
+    return 0;
+
 }
