@@ -25,6 +25,7 @@ const uint rgb_3[3] = {19, 18, 17};
 const uint buzzer_pin = 14; // GPIO do buzzer
 
 
+
 // Matrize de mapeamento de teclas
 const char keys[ROWS][COLS] = {
     {'1', '2', '3', 'A'},
@@ -143,22 +144,41 @@ char pico_scan_keypad() {
 void pico_keypad_control_led(char key) {
     switch (key) {
         case '1':
-            gpio_put(rgb_1[0], !gpio_get(rgb_1[0]));    //se a tecla 1 for pressionada, alterna o estado do canal vermelho do led 1
+            gpio_put(rgb_1[0], !gpio_get(rgb_1[0])); // Alterna o estado do canal vermelho do LED 1
             printf("Canal vermelho do led 1 alternado.\n");
             break;
         case '2':
-            gpio_put(rgb_1[1], !gpio_get(rgb_1[1]));
-            printf("Canal verde do led 1 alternado.\n"); //se a tecla 2 for pressionada, alterna o estado do canal verde do led 1
+            gpio_put(rgb_1[1], !gpio_get(rgb_1[1])); // Alterna o estado do canal verde do LED 1
+            printf("Canal verde do led 1 alternado.\n");
             break;
         case '3':
-            gpio_put(rgb_1[2], !gpio_get(rgb_1[2]));    //se a tecla 3 for pressionada, alterna o estado do canal azul do led 1
+            gpio_put(rgb_1[2], !gpio_get(rgb_1[2])); // Alterna o estado do canal azul do LED 1
             printf("Canal azul do led 1 alternado.\n");
             break;
         case 'A':
-            pico_rgb_turn_off(rgb_1); //se a tecla pressionada for o A, desliga todo o led rgb
+            pico_rgb_turn_off(rgb_1); // Desliga todo o LED RGB
             printf("Led 1 desligado\n");
             break;
+        case '4':
+            gpio_put(rgb_2[0], !gpio_get(rgb_2[0])); // Alterna o estado do canal vermelho do LED 1
+            printf("Canal vermelho do led 2 alternado.\n");
+            break;
+        case '5':
+            gpio_put(rgb_2[1], !gpio_get(rgb_2[1])); // Alterna o estado do canal vermelho do LED 1
+            printf("Canal verde do led 2 alternado.\n");
+            break;
+        case '6':
+            gpio_put(rgb_2[2], !gpio_get(rgb_2[2])); // Alterna o estado do canal vermelho do LED 1
+            printf("Canal azul do led 2 alternado.\n");
+            break;
+        case 'B':
+            gpio_put(rgb_2[0], !gpio_get(rgb_2[0]));
+            gpio_put(rgb_2[1], !gpio_get(rgb_2[1]));
+            gpio_put(rgb_2[2], !gpio_get(rgb_2[2]));
+            printf("Todos os canais do led 2 alternados");
+            break;
         default:
+            printf("Tecla '%c' não mapeada.\n", key);
             break;
     }
 }
