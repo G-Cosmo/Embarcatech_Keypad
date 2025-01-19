@@ -50,6 +50,8 @@ e azul respectivamente no terceiro led.
 
 As teclas *A*, *B* e *C* desligam o primeiro, segundo e terceiro leds respectivamente.
 
+A tecla * liga todos os leds de uma vez.
+
 A tecla *0* desliga todos os leds de uma vez.
 
 ## No modo música
