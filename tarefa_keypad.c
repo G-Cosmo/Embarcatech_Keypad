@@ -36,8 +36,8 @@ const char keys[ROWS][COLS] = {
 
 //função para inicializar o buzzer
 void pico_buzzer_init(uint gpio) {
-    gpio_init(gpio);
-    gpio_set_dir(gpio, GPIO_OUT);
+    //gpio_init(gpio);
+    //gpio_set_dir(gpio, GPIO_OUT);
     gpio_set_function(gpio, GPIO_FUNC_PWM);
     uint slice_num = pwm_gpio_to_slice_num(gpio);
     pwm_set_enabled(slice_num, true);
@@ -46,14 +46,36 @@ void pico_buzzer_init(uint gpio) {
 //função para tocar uma nota no buzzer
 void pico_buzzer_play(uint gpio, uint frequency) {
     uint slice_num = pwm_gpio_to_slice_num(gpio);
-    pwm_set_wrap(slice_num, clock_get_hz(clk_sys) / frequency - 1);
-    pwm_set_chan_level(slice_num, PWM_CHAN_A, (clock_get_hz(clk_sys) / frequency) / 2);
+    //uint32_t clock = clock_get_hz(clk_sys);
+    //uint32_t wrap = clock / frequency - 1;
+    uint32_t clock = 125000000; 
+    uint32_t divider = clock / (frequency * 4096); 
+    uint32_t wrap = (clock / divider) / frequency - 1;
+    uint32_t level = wrap / 2; 
+    //pwm_set_wrap(slice_num, clock_get_hz(clk_sys) / frequency - 1);
+    //pwm_set_chan_level(slice_num, PWM_CHAN_A, (clock_get_hz(clk_sys) / frequency) / 2);
+    pwm_set_clkdiv(slice_num, divider);
+    pwm_set_wrap(slice_num, wrap);
+    pwm_set_chan_level(slice_num, PWM_CHAN_A, level);
+    pwm_set_enabled(slice_num, true);
+    /*uint32_t period_us = 1000000 / frequency; // Período em microssegundos
+    uint32_t half_period_us = period_us / 2; // Meio período para alternar o estado do pino
+    uint32_t end_time = to_ms_since_boot(get_absolute_time()) + 250;
+
+    while (to_ms_since_boot(get_absolute_time()) < end_time) {
+        gpio_put(gpio, 1);
+        sleep_us(half_period_us);
+        gpio_put(gpio, 0);
+        sleep_us(half_period_us);
+    }*/
 }
 
 //função para parar o buzzer
 void pico_buzzer_stop(uint gpio) {
     uint slice_num = pwm_gpio_to_slice_num(gpio);
     pwm_set_chan_level(slice_num, PWM_CHAN_A, 0);
+    pwm_set_enabled(slice_num, false);
+    //gpio_put(gpio, 0);
 }
 
 //função para tocar a melodia "Marcha Soldado"
