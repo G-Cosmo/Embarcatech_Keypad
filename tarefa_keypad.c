@@ -82,8 +82,7 @@ void play_marcha_soldado(uint gpio) {
 
 //função que inicializa os pinos de um led RGB
 void pico_rgb_init(const uint *rgb_pin)
-{   
-    
+{    
     for(int i = 0; i < 3; i++)
     {
         //_rgb_1[i] = rgb_pin[i];
@@ -98,14 +97,6 @@ void pico_rgb_turn_off(const uint *rgb_pin)
     for(int i = 0; i < 3; i++)
     {
         gpio_put(rgb_pin[i], false);        //garante que todos serão desligados por padrão
-    }
-}
-
-void pico_rgb_turn_on(const uint *rgb_pin)
-{
-    for(int i = 0; i < 3; i++)
-    {
-        gpio_put(rgb_pin[i], true);        //garante que todos serão desligados por padrão
     }
 }
 
@@ -164,11 +155,11 @@ void pico_keypad_control_led(char key) {
             printf("Canal vermelho do led 2 alternado.\n");
             break;
         case '5':
-            gpio_put(rgb_2[1], !gpio_get(rgb_2[1])); // Alterna o estado do canal vermelho do LED 2
+            gpio_put(rgb_2[1], !gpio_get(rgb_2[1])); // Alterna o estado do canal verde do LED 2
             printf("Canal verde do led 2 alternado.\n");
             break;
         case '6':
-            gpio_put(rgb_2[2], !gpio_get(rgb_2[2])); // Alterna o estado do canal vermelho do LED 2
+            gpio_put(rgb_2[2], !gpio_get(rgb_2[2])); // Alterna o estado do canal azul do LED 2
             printf("Canal azul do led 2 alternado.\n");
             break;
         case 'B':
@@ -180,11 +171,11 @@ void pico_keypad_control_led(char key) {
             printf("Canal vermelho do led 3 alternado.\n");
             break;
         case '8':
-            gpio_put(rgb_3[1], !gpio_get(rgb_3[1])); // Alterna o estado do canal vermelho do LED 3
+            gpio_put(rgb_3[1], !gpio_get(rgb_3[1])); // Alterna o estado do canal verde do LED 3
             printf("Canal verde do led 3 alternado.\n");
             break;
         case '9':
-            gpio_put(rgb_3[2], !gpio_get(rgb_3[2])); // Alterna o estado do canal vermelho do LED 3
+            gpio_put(rgb_3[2], !gpio_get(rgb_3[2])); // Alterna o estado do canal azul do LED 3
             printf("Canal azul do led 3 alternado.\n");
             break;
         case 'C':
@@ -246,7 +237,7 @@ void pico_keypad_control_music(char key) {
             sleep_ms(200);
             pico_buzzer_stop(buzzer_pin);
             break;
-        case 'A': play_marcha_soldado(buzzer_pin); break; // Toca a melodia "Marcha Soldado" quando a tecla 'D' é pressionada
+        case 'A': play_marcha_soldado(buzzer_pin); break; // Toca a melodia "Marcha Soldado" quando a tecla 'A' é pressionada
         case '0': pico_buzzer_stop(buzzer_pin); break; // Para de tocar a nota no buzzer
         default: pico_buzzer_stop(buzzer_pin); break;
     }
