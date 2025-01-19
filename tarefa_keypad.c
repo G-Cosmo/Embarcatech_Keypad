@@ -82,8 +82,7 @@ void play_marcha_soldado(uint gpio) {
 
 //função que inicializa os pinos de um led RGB
 void pico_rgb_init(const uint *rgb_pin)
-{   
-    
+{    
     for(int i = 0; i < 3; i++)
     {
         //_rgb_1[i] = rgb_pin[i];
@@ -98,14 +97,6 @@ void pico_rgb_turn_off(const uint *rgb_pin)
     for(int i = 0; i < 3; i++)
     {
         gpio_put(rgb_pin[i], false);        //garante que todos serão desligados por padrão
-    }
-}
-
-void pico_rgb_turn_on(const uint *rgb_pin)
-{
-    for(int i = 0; i < 3; i++)
-    {
-        gpio_put(rgb_pin[i], true);        //garante que todos serão desligados por padrão
     }
 }
 
@@ -156,7 +147,7 @@ void pico_keypad_control_led(char key) {
             printf("Canal azul do led 1 alternado.\n");
             break;
         case 'A':
-            pico_rgb_turn_off(rgb_1); // Desliga todo o LED RGB
+            pico_rgb_turn_off(rgb_1); // Desliga o LED 1
             printf("Led 1 desligado\n");
             break;
         case '4':
@@ -164,16 +155,38 @@ void pico_keypad_control_led(char key) {
             printf("Canal vermelho do led 2 alternado.\n");
             break;
         case '5':
-            gpio_put(rgb_2[1], !gpio_get(rgb_2[1])); // Alterna o estado do canal vermelho do LED 2
+            gpio_put(rgb_2[1], !gpio_get(rgb_2[1])); // Alterna o estado do canal verde do LED 2
             printf("Canal verde do led 2 alternado.\n");
             break;
         case '6':
-            gpio_put(rgb_2[2], !gpio_get(rgb_2[2])); // Alterna o estado do canal vermelho do LED 2
+            gpio_put(rgb_2[2], !gpio_get(rgb_2[2])); // Alterna o estado do canal azul do LED 2
             printf("Canal azul do led 2 alternado.\n");
             break;
         case 'B':
+            pico_rgb_turn_off(rgb_2); // Desliga o LED 2
+            printf("Led 2 desligado\n");
+            break;
+        case '7':
+            gpio_put(rgb_3[0], !gpio_get(rgb_3[0])); // Alterna o estado do canal vermelho do LED 3
+            printf("Canal vermelho do led 3 alternado.\n");
+            break;
+        case '8':
+            gpio_put(rgb_3[1], !gpio_get(rgb_3[1])); // Alterna o estado do canal verde do LED 3
+            printf("Canal verde do led 3 alternado.\n");
+            break;
+        case '9':
+            gpio_put(rgb_3[2], !gpio_get(rgb_3[2])); // Alterna o estado do canal azul do LED 3
+            printf("Canal azul do led 3 alternado.\n");
+            break;
+        case 'C':
+            pico_rgb_turn_off(rgb_3); // Desliga o LED 3
+            printf("Led 3 desligado\n");
+            break;
+        case '0': // Desliga todos os LEDS de uma vez
+            pico_rgb_turn_off(rgb_1);
             pico_rgb_turn_off(rgb_2);
-            printf("Led 2 desligado");
+            pico_rgb_turn_off(rgb_3);
+            printf("Todos os LEDS desligados");
             break;
         default:
             printf("Tecla '%c' não mapeada.\n", key);
@@ -224,7 +237,7 @@ void pico_keypad_control_music(char key) {
             sleep_ms(200);
             pico_buzzer_stop(buzzer_pin);
             break;
-        case 'A': play_marcha_soldado(buzzer_pin); break; // Toca a melodia "Marcha Soldado" quando a tecla 'D' é pressionada
+        case 'A': play_marcha_soldado(buzzer_pin); break; // Toca a melodia "Marcha Soldado" quando a tecla 'A' é pressionada
         case '0': pico_buzzer_stop(buzzer_pin); break; // Para de tocar a nota no buzzer
         default: pico_buzzer_stop(buzzer_pin); break;
     }
@@ -238,7 +251,7 @@ int main() {
     pico_setup_keypad();
     pico_rgb_init(rgb_1);
     pico_rgb_init(rgb_2);
-   // pico_rgb_init(rgb_3);
+    pico_rgb_init(rgb_3);
     pico_buzzer_init(buzzer_pin);
     
     while (true) {
@@ -246,7 +259,10 @@ int main() {
         if (key != '\0') {
             if (key == 'D') {
                 music_mode = true; // Muda para o modo de reprodução de música
-                pico_buzzer_play(buzzer_pin, NOTE_DO1); // Toca uma nota para indicar a mudança de modo
+                pico_buzzer_play(buzzer_pin, NOTE_RE); // Toca uma nota para indicar a mudança de modo
+                pico_rgb_turn_off(rgb_1); // Desliga todos os LEDS ao mudar para o modo de música
+                pico_rgb_turn_off(rgb_2);
+                pico_rgb_turn_off(rgb_3);
             } else if (key == '0') {
                 music_mode = false; // Volta para o modo padrão (LEDs)
             }
@@ -256,9 +272,10 @@ int main() {
             } else {
                 pico_keypad_control_led(key); // Executa a ação correspondente no modo padrão (LEDs)
             }
+        }
         sleep_ms(100); // Pausa para evitar leitura repetida contínua
-    }
+        
     }
     return 0;
-
+    
 }
