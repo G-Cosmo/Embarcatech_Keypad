@@ -156,42 +156,46 @@ void pico_keypad_control_led(char key) {
             printf("Canal azul do led 1 alternado.\n");
             break;
         case 'A':
-            pico_rgb_turn_off(rgb_1); // Desliga todo o LED RGB
+            pico_rgb_turn_off(rgb_1); // Desliga o LED 1
             printf("Led 1 desligado\n");
             break;
         case '4':
-            gpio_put(rgb_2[0], !gpio_get(rgb_2[0])); // Alterna o estado do canal vermelho do LED 1
+            gpio_put(rgb_2[0], !gpio_get(rgb_2[0])); // Alterna o estado do canal vermelho do LED 2
             printf("Canal vermelho do led 2 alternado.\n");
             break;
         case '5':
-            gpio_put(rgb_2[1], !gpio_get(rgb_2[1])); // Alterna o estado do canal vermelho do LED 1
+            gpio_put(rgb_2[1], !gpio_get(rgb_2[1])); // Alterna o estado do canal vermelho do LED 2
             printf("Canal verde do led 2 alternado.\n");
             break;
         case '6':
-            gpio_put(rgb_2[2], !gpio_get(rgb_2[2])); // Alterna o estado do canal vermelho do LED 1
+            gpio_put(rgb_2[2], !gpio_get(rgb_2[2])); // Alterna o estado do canal vermelho do LED 2
             printf("Canal azul do led 2 alternado.\n");
             break;
+        case 'B':
+            pico_rgb_turn_off(rgb_2); // Desliga o LED 2
+            printf("Led 2 desligado\n");
+            break;
         case '7':
-            gpio_put(rgb_3[0], !gpio_get(rgb_3[0])); // Alterna o estado do canal vermelho do LED 1
+            gpio_put(rgb_3[0], !gpio_get(rgb_3[0])); // Alterna o estado do canal vermelho do LED 3
             printf("Canal vermelho do led 3 alternado.\n");
             break;
         case '8':
-            gpio_put(rgb_3[1], !gpio_get(rgb_3[1])); // Alterna o estado do canal vermelho do LED 1
+            gpio_put(rgb_3[1], !gpio_get(rgb_3[1])); // Alterna o estado do canal vermelho do LED 3
             printf("Canal verde do led 3 alternado.\n");
             break;
         case '9':
-            gpio_put(rgb_3[2], !gpio_get(rgb_3[2])); // Alterna o estado do canal vermelho do LED 1
+            gpio_put(rgb_3[2], !gpio_get(rgb_3[2])); // Alterna o estado do canal vermelho do LED 3
             printf("Canal azul do led 3 alternado.\n");
             break;
-        case 'B':
-            gpio_put(rgb_2[0], !gpio_get(rgb_2[0]));
-            gpio_put(rgb_2[1], !gpio_get(rgb_2[1]));
-            gpio_put(rgb_2[2], !gpio_get(rgb_2[2]));
-            printf("Todos os canais do led 2 alternados");
-            break;
         case 'C':
-            pico_rgb_turn_off(rgb_3); // Desliga todo o LED RGB
+            pico_rgb_turn_off(rgb_3); // Desliga o LED 3
             printf("Led 3 desligado\n");
+            break;
+        case '0': // Desliga todos os LEDS de uma vez
+            pico_rgb_turn_off(rgb_1);
+            pico_rgb_turn_off(rgb_2);
+            pico_rgb_turn_off(rgb_3);
+            printf("Todos os LEDS desligados");
             break;
         default:
             printf("Tecla '%c' não mapeada.\n", key);
@@ -265,6 +269,9 @@ int main() {
             if (key == 'D') {
                 music_mode = true; // Muda para o modo de reprodução de música
                 pico_buzzer_play(buzzer_pin, NOTE_DO1); // Toca uma nota para indicar a mudança de modo
+                pico_rgb_turn_off(rgb_1); // Desliga todos os LEDS ao mudar para o modo de música
+                pico_rgb_turn_off(rgb_2);
+                pico_rgb_turn_off(rgb_3);
             } else if (key == '0') {
                 music_mode = false; // Volta para o modo padrão (LEDs)
             }
