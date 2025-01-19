@@ -108,6 +108,14 @@ void pico_rgb_turn_off(const uint *rgb_pin)
     }
 }
 
+void pico_rgb_turn_on(const uint *rgb_pin)
+{
+    for(int i = 0; i < 3; i++)
+    {
+        gpio_put(rgb_pin[i], true);        //garante que todos serão desligados por padrão
+    }
+}
+
 void pico_setup_keypad() {
     // Configura os pinos das linhas como saída e os pinos das colunas como entrada
     for (int i = 0; i < ROWS; i++) {
@@ -127,8 +135,8 @@ char pico_scan_keypad() {
     for (int r = 0; r < ROWS; r++) {
         gpio_put(row_pins[r], 0); // Ativa a linha (coloca em nível baixo)
         for (int c = 0; c < COLS; c++) {
-            if (gpio_get(col_pins[c]) == 0) { // Verifica se o botão foi pressionado
-                while (gpio_get(col_pins[c]) == 0) {
+            if (!gpio_get(col_pins[c])) { // Verifica se o botão foi pressionado
+                while (!gpio_get(col_pins[c])) {
                     // Espera até que o botão seja liberado
                 }
                 return keys[r][c]; // Retorna a tecla pressionada
@@ -195,6 +203,12 @@ void pico_keypad_control_led(char key) {
             pico_rgb_turn_off(rgb_2);
             pico_rgb_turn_off(rgb_3);
             printf("Todos os LEDS desligados");
+            break;
+        case '*':
+            pico_rgb_turn_on(rgb_1);
+            pico_rgb_turn_on(rgb_2);
+            pico_rgb_turn_on(rgb_3);
+            printf("Todos os LEDS ligados");
             break;
         default:
             printf("Tecla '%c' não mapeada.\n", key);
