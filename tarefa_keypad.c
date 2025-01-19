@@ -171,11 +171,27 @@ void pico_keypad_control_led(char key) {
             gpio_put(rgb_2[2], !gpio_get(rgb_2[2])); // Alterna o estado do canal vermelho do LED 1
             printf("Canal azul do led 2 alternado.\n");
             break;
+        case '7':
+            gpio_put(rgb_3[0], !gpio_get(rgb_3[0])); // Alterna o estado do canal vermelho do LED 1
+            printf("Canal vermelho do led 3 alternado.\n");
+            break;
+        case '8':
+            gpio_put(rgb_3[1], !gpio_get(rgb_3[1])); // Alterna o estado do canal vermelho do LED 1
+            printf("Canal verde do led 3 alternado.\n");
+            break;
+        case '9':
+            gpio_put(rgb_3[2], !gpio_get(rgb_3[2])); // Alterna o estado do canal vermelho do LED 1
+            printf("Canal azul do led 3 alternado.\n");
+            break;
         case 'B':
             gpio_put(rgb_2[0], !gpio_get(rgb_2[0]));
             gpio_put(rgb_2[1], !gpio_get(rgb_2[1]));
             gpio_put(rgb_2[2], !gpio_get(rgb_2[2]));
             printf("Todos os canais do led 2 alternados");
+            break;
+        case 'C':
+            pico_rgb_turn_off(rgb_3); // Desliga todo o LED RGB
+            printf("Led 3 desligado\n");
             break;
         default:
             printf("Tecla '%c' não mapeada.\n", key);
@@ -240,7 +256,7 @@ int main() {
     pico_setup_keypad();
     pico_rgb_init(rgb_1);
     pico_rgb_init(rgb_2);
-   // pico_rgb_init(rgb_3);
+    pico_rgb_init(rgb_3);
     pico_buzzer_init(buzzer_pin);
     
     while (true) {
@@ -259,8 +275,8 @@ int main() {
                 pico_keypad_control_led(key); // Executa a ação correspondente no modo padrão (LEDs)
             }
         sleep_ms(100); // Pausa para evitar leitura repetida contínua
+        }
     }
-
     return 0;
-
+    
 }
