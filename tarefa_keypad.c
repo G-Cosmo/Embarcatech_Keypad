@@ -160,22 +160,20 @@ void pico_keypad_control_led(char key) {
             printf("Led 1 desligado\n");
             break;
         case '4':
-            gpio_put(rgb_2[0], !gpio_get(rgb_2[0])); // Alterna o estado do canal vermelho do LED 1
+            gpio_put(rgb_2[0], !gpio_get(rgb_2[0])); // Alterna o estado do canal vermelho do LED 2
             printf("Canal vermelho do led 2 alternado.\n");
             break;
         case '5':
-            gpio_put(rgb_2[1], !gpio_get(rgb_2[1])); // Alterna o estado do canal vermelho do LED 1
+            gpio_put(rgb_2[1], !gpio_get(rgb_2[1])); // Alterna o estado do canal vermelho do LED 2
             printf("Canal verde do led 2 alternado.\n");
             break;
         case '6':
-            gpio_put(rgb_2[2], !gpio_get(rgb_2[2])); // Alterna o estado do canal vermelho do LED 1
+            gpio_put(rgb_2[2], !gpio_get(rgb_2[2])); // Alterna o estado do canal vermelho do LED 2
             printf("Canal azul do led 2 alternado.\n");
             break;
         case 'B':
-            gpio_put(rgb_2[0], !gpio_get(rgb_2[0]));
-            gpio_put(rgb_2[1], !gpio_get(rgb_2[1]));
-            gpio_put(rgb_2[2], !gpio_get(rgb_2[2]));
-            printf("Todos os canais do led 2 alternados");
+            pico_rgb_turn_off(rgb_2);
+            printf("Led 2 desligado");
             break;
         default:
             printf("Tecla '%c' não mapeada.\n", key);
