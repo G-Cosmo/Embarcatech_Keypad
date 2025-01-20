@@ -65,3 +65,7 @@ As teclas *5*, *6*, *7* e *8* tocam as notas *Sol*, *La*, *Si* e *Do* respectiva
 A tecla *A* toca a música "Marcha Soldado".
 
 A tecla *0* sai do modo música e volta para o modo led.
+
+## Vídeo de demonstração
+
+https://youtu.be/A282mXdGhRc
